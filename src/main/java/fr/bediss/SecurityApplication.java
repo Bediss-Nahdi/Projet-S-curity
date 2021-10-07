@@ -1,5 +1,7 @@
 package fr.bediss;
 
+import java.util.Date;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import fr.bediss.entities.Role;
-import fr.bediss.entities.User;
+import fr.bediss.entities.Produit;
+import fr.bediss.services.ProduitService;
 import fr.bediss.services.UserService;
 
 @SpringBootApplication
@@ -21,23 +23,17 @@ public class SecurityApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SecurityApplication.class, args);
 	}
+	
+	@Autowired
+	ProduitService produitService;
 
 	@PostConstruct
 	void init_users() {
-		// ajouter les rôles
-		userService.addRole(new Role(null, "ADMIN"));
-		userService.addRole(new Role(null, "USER"));
-		// ajouter les users
-		userService.saveUser(new User(null, "admin", "123", true, null));
-		userService.saveUser(new User(null, "Bédiss", "123", true, null));
-		userService.saveUser(new User(null, "sebastien", "123", true, null));
-		// ajouter les rôles aux users
-		userService.addRoleToUser("admin", "ADMIN");
-		userService.addRoleToUser("admin", "USER");
-		userService.addRoleToUser("Bédiss", "USER");
-		userService.addRoleToUser("sebastien", "USER");
-	}
-
+	produitService.saveProduit(new Produit(null,"PC Dell", 2600.0, new Date()));
+	produitService.saveProduit(new Produit(null,"PC Asus", 2800.0, new Date()));
+	produitService.saveProduit(new Produit(null,"Imp Epson", 900.0, new Date()));
+	} 
+	
 	@Bean
 	BCryptPasswordEncoder getBCE() {
 		return new BCryptPasswordEncoder();
