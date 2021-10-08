@@ -30,14 +30,36 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
+		
+		
+		/*  C'EST POUR ANGULAR ou React ....  */ 
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		response.addHeader("Access-Control-Allow-Methods",
+		"GET,HEAD,OPTIONS,POST,PUT,DELETE");
+		response.addHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers,Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method,Access-Control-Request-Headers, Authorization");
+		response.addHeader("Access-Control-Expose-Headers","Authorization, Access-ControlAllow-Origin,Access-Control-Allow-Credentials ");
+		if (request.getMethod().equals("OPTIONS"))
+		{
+		response.setStatus(HttpServletResponse.SC_OK);
+		return;
+		}
+		
+		
+		
+		
+		/* Partie sécurité indépendante de  Angular React ... */
+		
 		String jwt = request.getHeader("Authorization");
-		if (jwt == null || !jwt.startsWith("Bearer ")) {
+		if (jwt == null || !jwt.startsWith(SecParams.PREFIX)) {
 			filterChain.doFilter(request, response);
 			return;
 		}
+		
+		
+		
 		JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SecParams.SECRET)).build();
 		// enlever le préfixe Bearer du jwt
-		jwt = jwt.substring(7); // 7 caractères dans "Bearer "
+		jwt = jwt.substring((SecParams.PREFIX.length())); // 7 caractères dans "Bearer "
 		DecodedJWT decodedJWT = verifier.verify(jwt);
 		String username = decodedJWT.getSubject();
 		List<String> roles = decodedJWT.getClaims().get("roles").asList(String.class);

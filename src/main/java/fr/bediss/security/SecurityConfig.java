@@ -1,6 +1,7 @@
 package fr.bediss.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -50,12 +51,37 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		/* 4 - C */
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		
+		
+		/* Cette partie c'est pour les users */
+		
 		/* 4 - D */
 		http.authorizeRequests().antMatchers("/login").permitAll(); //==> donner à tout le monde le droit de se connecter
-		
-		
+			
 		// Un fois que le contrôller est fait [ -dans notre cas : getAllUsers()- ]
 		http.authorizeRequests().antMatchers("/all").hasAuthority("ADMIN");
+		
+		
+		
+		/* Cette partie c'est pour les produits */
+		
+		// UNE FOIS QUE TOUTES LES CLASS SONT MISES EN PLACE  ==> Restrindre l'accès aux api grâce antMatchers
+		//consulter tous les produits
+
+		http.authorizeRequests().antMatchers("/api/all/**").hasAnyAuthority("ADMIN","USER");
+
+		 //consulter un produit par son id
+
+		http.authorizeRequests().antMatchers(HttpMethod.GET,"/api/**").hasAnyAuthority("ADMIN","USER");
+
+		 //ajouter un nouveau produit
+		http.authorizeRequests().antMatchers(HttpMethod.POST,"/api/**").hasAuthority("ADMIN");
+
+		 //modifier un produit
+		http.authorizeRequests().antMatchers(HttpMethod.PUT,"/api/**").hasAuthority("ADMIN");
+
+		//supprimer un produit
+		http.authorizeRequests().antMatchers(HttpMethod.DELETE,"/api/**").hasAuthority("ADMIN");
+		
 		
 		
 		/* 4 - E */
